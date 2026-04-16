@@ -1,45 +1,69 @@
-export default function PaymentModal({ isOpen, orderId, onConfirm, onCancel }) {
-  if (!isOpen) return null
+import { useState } from 'react'
 
-  const tableDisplay = orderId?.tableId || 'Order'
+export default function PreviousOrders({ previousOrders }) {
+  const [expandedOrderId, setExpandedOrderId] = useState(null)
+
+  const toggleExpanded = (orderId) => {
+    setExpandedOrderId(expandedOrderId === orderId ? null : orderId)
+  }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="rounded-3xl bg-white p-8 shadow-2xl">
-        <h3 className="mb-6 text-2xl font-semibold text-slate-900">Select Payment Method</h3>
-        <p className="mb-8 text-slate-600">How would you like to pay for {tableDisplay}?</p>
-        
-        <div className="grid gap-4 sm:grid-cols-2">
-          <button
-            className="flex items-center gap-3 rounded-3xl border-2 border-slate-200 bg-white p-6 text-left transition hover:border-orange-400 hover:bg-orange-50"
-            onClick={() => onConfirm('cash')}
-          >
-            <div className="text-3xl">💵</div>
-            <div>
-              <p className="font-semibold text-slate-900">Cash</p>
-              <p className="text-sm text-slate-500">Pay with cash</p>
-            </div>
-          </button>
-
-          <button
-            className="flex items-center gap-3 rounded-3xl border-2 border-slate-200 bg-white p-6 text-left transition hover:border-orange-400 hover:bg-orange-50"
-            onClick={() => onConfirm('upi')}
-          >
-            <div className="text-3xl">📱</div>
-            <div>
-              <p className="font-semibold text-slate-900">UPI</p>
-              <p className="text-sm text-slate-500">Pay with UPI</p>
-            </div>
-          </button>
+    <section className="mt-6 space-y-4">
+      {previousOrders.length === 0 ? (
+        <div className="rounded-3xl border border-dashed border-slate-300 bg-white/80 p-8 text-center text-sm text-slate-600">
+          No previous paid orders yet.
         </div>
+      ) : (
+        <>
+          <div className="grid gap-4">
+            {previousOrders.slice(0, 10).map((order) => (
+              <button
+                key={order.id}
+                onClick={() => toggleExpanded(order.id)}
+                className="text-left rounded-3xl border border-slate-200 bg-slate-50 p-4 shadow-sm transition hover:shadow-md hover:border-slate-300"
+              >
+                <div className="flex items-center justify-between gap-4">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <h4 className="font-semibold text-slate-900">Order #{order.id}</h4>
+                      <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-800">
+                        Paid
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-600">{order.type} • {order.tableId} • {order.items.length} items</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-semibold text-slate-900">₹{order.total}</p>
+                    {order.paymentMethod && (
+                      <p className="text-xs text-slate-500 capitalize">{order.paymentMethod}</p>
+                    )}
+                  </div>
+                </div>
 
-        <button
-          className="mt-6 w-full rounded-3xl border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-100"
-          onClick={onCancel}
-        >
-          Cancel
-        </button>
-      </div>
-    </div>
+                {expandedOrderId === order.id && (
+                  <div className="mt-4 space-y-2 border-t border-slate-200 pt-4">
+                    {order.items.map((item, idx) => (
+                      <div key={idx} className="flex items-center justify-between rounded-2xl bg-white p-3">
+                        <div>
+                          <p className="font-semibold text-slate-900">{item.name}</p>
+                          <p className="text-xs text-slate-500">₹{item.price}</p>
+                        </div>
+                        <span className="rounded-full bg-orange-100 px-3 py-1 text-sm font-semibold text-orange-700">×{item.quantity}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </button>
+            ))}
+          </div>
+
+          {previousOrders.length > 10 && (
+            <p className="text-center text-sm text-slate-500">
+              ...and {previousOrders.length - 10} more previous orders
+            </p>
+          )}
+        </>
+      )}
+    </section>
   )
 }
