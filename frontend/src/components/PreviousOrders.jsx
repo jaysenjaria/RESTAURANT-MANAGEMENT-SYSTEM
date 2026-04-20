@@ -2,6 +2,8 @@ import { useState } from 'react'
 
 export default function PreviousOrders({ previousOrders }) {
   const [expandedOrderId, setExpandedOrderId] = useState(null)
+  const formatOrderDateTime = (value) =>
+    value ? new Date(value).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' }) : ''
 
   const toggleExpanded = (orderId) => {
     setExpandedOrderId(expandedOrderId === orderId ? null : orderId)
@@ -31,6 +33,10 @@ export default function PreviousOrders({ previousOrders }) {
                       </span>
                     </div>
                     <p className="text-xs text-slate-600">{order.type} • {order.tableId} • {order.items.length} items</p>
+                    <p className="text-xs text-slate-600">Placed {formatOrderDateTime(order.createdAt)}</p>
+                    {order.readyAt && (
+                      <p className="text-xs text-slate-600">Ready {formatOrderDateTime(order.readyAt)}</p>
+                    )}
                   </div>
                   <div className="text-right">
                     <p className="font-semibold text-slate-900">₹{order.total}</p>

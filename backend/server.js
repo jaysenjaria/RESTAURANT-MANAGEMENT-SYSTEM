@@ -127,6 +127,9 @@ app.patch('/api/orders/:id/status', (req, res) => {
   }
 
   order.status = status
+  if (status === 'ready') {
+    order.readyAt = new Date().toISOString()
+  }
   if (paymentMethod) {
     order.paymentMethod = paymentMethod
   }

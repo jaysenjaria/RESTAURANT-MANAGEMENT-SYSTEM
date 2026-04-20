@@ -49,6 +49,7 @@ function App() {
   const [message, setMessage] = useState('')
   const [editingOrderId, setEditingOrderId] = useState(null)
   const [editingOrderTableId, setEditingOrderTableId] = useState(null)
+  const [editingOrderCreatedAt, setEditingOrderCreatedAt] = useState(null)
   const [paymentModalOpen, setPaymentModalOpen] = useState(false)
   const [paymentOrderId, setPaymentOrderId] = useState(null)
   const [isAddingProduct, setIsAddingProduct] = useState(false)
@@ -138,6 +139,9 @@ function App() {
   }
 
   const clearCart = () => setCart([])
+
+  const formatOrderDateTime = (value) =>
+    value ? new Date(value).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' }) : ''
 
   const cartTotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0)
 
@@ -239,6 +243,7 @@ function App() {
     if (order) {
       setEditingOrderId(orderId)
       setEditingOrderTableId(order.tableId)
+      setEditingOrderCreatedAt(order.createdAt)
       setSelectedTableId(order.tableId)
       setCart(order.items.map((item) => ({ ...item })))
       setView('Order View')
@@ -248,6 +253,7 @@ function App() {
   const cancelEdit = () => {
     setEditingOrderId(null)
     setEditingOrderTableId(null)
+    setEditingOrderCreatedAt(null)
     clearCart()
   }
 
@@ -262,13 +268,19 @@ function App() {
           tableId: order.tableId,
           type: order.type,
           orderIds: [],
-          items: [],
-          total: 0
+          total: 0,
+          orders: []
         }
       }
       grouped[key].orderIds.push(order.id)
-      grouped[key].items.push(...order.items)
       grouped[key].total += order.total
+      grouped[key].orders.push({
+        id: order.id,
+        createdAt: order.createdAt,
+        readyAt: order.readyAt,
+        items: order.items,
+        total: order.total
+      })
     })
     
     return Object.values(grouped)
@@ -323,6 +335,7 @@ function App() {
               selectedTable={selectedTable}
               cartTotal={cartTotal}
               editingOrderId={editingOrderId}
+              editingOrderCreatedAt={editingOrderCreatedAt}
               cancelEdit={cancelEdit}
               onAddProduct={() => setIsAddingProduct(true)}
             />

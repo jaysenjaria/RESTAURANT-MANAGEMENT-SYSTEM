@@ -17,9 +17,13 @@ export default function OrderView({
   selectedTable,
   cartTotal,
   editingOrderId,
+  editingOrderCreatedAt,
   cancelEdit,
   onAddProduct
 }) {
+  const formatOrderDateTime = (value) =>
+    value ? new Date(value).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' }) : ''
+
   return (
     <section className="space-y-4">
       <div className="rounded-3xl bg-white/90 p-5 shadow-sm shadow-slate-200/50">
@@ -100,8 +104,13 @@ export default function OrderView({
             </div>
 
             <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4">
-              <div className="mb-4 flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-slate-900">Current order</h3>
+              <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <h3 className="text-lg font-semibold text-slate-900">Current order</h3>
+                  {editingOrderId && editingOrderCreatedAt && (
+                    <p className="text-sm text-slate-500">Placed {formatOrderDateTime(editingOrderCreatedAt)}</p>
+                  )}
+                </div>
                 <span className="text-sm text-slate-500">{cart.length} items</span>
               </div>
               {cart.length === 0 ? (

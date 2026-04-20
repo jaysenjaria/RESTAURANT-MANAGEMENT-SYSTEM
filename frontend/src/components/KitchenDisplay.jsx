@@ -1,4 +1,7 @@
 export default function KitchenDisplay({ currentKitchenOrders, onMarkReady, onEdit }) {
+  const formatOrderDateTime = (value) =>
+    value ? new Date(value).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' }) : ''
+
   return (
     <section className="space-y-4">
       <div className="grid gap-4">
@@ -14,6 +17,7 @@ export default function KitchenDisplay({ currentKitchenOrders, onMarkReady, onEd
                   <div>
                     <h4 className="text-lg font-semibold text-slate-900">Order #{order.id}</h4>
                     <p className="text-sm text-slate-600">{order.tableId} • {order.type}</p>
+                    <p className="text-xs text-slate-500">Placed {formatOrderDateTime(order.createdAt)}</p>
                   </div>
                   <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-slate-600">₹{order.total}</span>
                 </div>

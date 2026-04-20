@@ -1,4 +1,12 @@
+import { useState } from 'react'
+import OrderDetailsModal from './OrderDetailsModal'
+
 export default function BillsView({ ordersWaitingPayment, onPay, onEdit }) {
+  const [selectedOrder, setSelectedOrder] = useState(null)
+
+  const formatOrderDateTime = (value) =>
+    value ? new Date(value).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' }) : ''
+
   return (
     <section className="space-y-4">
       <div className="grid gap-4">
@@ -14,23 +22,27 @@ export default function BillsView({ ordersWaitingPayment, onPay, onEdit }) {
                   <div>
                     <h4 className="text-lg font-semibold text-slate-900">Table {bill.tableId}</h4>
                     <p className="text-sm text-slate-500">{bill.type}</p>
+                    <div className="mt-4 flex flex-wrap gap-4 text-xs text-slate-600">
+                      {bill.orders.map((order) => (
+                        <button
+                          key={`${bill.tableId}-${order.id}`}
+                          type="button"
+                          onClick={() => setSelectedOrder(order)}
+                          className="w-[280px] rounded-3xl border border-slate-200 bg-slate-50 p-3 text-left transition hover:bg-slate-100 hover:border-orange-400"
+                        >
+                          <div className="flex items-center justify-between gap-2">
+                            <span className="font-semibold">Order #{order.id}</span>
+                            <span className="text-slate-400">View items</span>
+                          </div>
+                          <p className="mt-1 text-slate-500">Placed {formatOrderDateTime(order.createdAt)}</p>
+                          <p className="text-slate-500">Ready {formatOrderDateTime(order.readyAt)}</p>
+                        </button>
+                      ))}
+                    </div>
                   </div>
                   <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-800">
                     Ready
                   </span>
-                </div>
-
-                <div className="space-y-2">
-                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Items</p>
-                  {bill.items.map((item, idx) => (
-                    <div key={idx} className="flex items-center justify-between rounded-2xl bg-slate-50 p-3">
-                      <div>
-                        <p className="font-semibold text-slate-900">{item.name}</p>
-                        <p className="text-xs text-slate-500">₹{item.price}</p>
-                      </div>
-                      <span className="rounded-full bg-orange-100 px-3 py-1 text-sm font-semibold text-orange-700">×{item.quantity}</span>
-                    </div>
-                  ))}
                 </div>
 
                 <div className="border-t border-slate-200 pt-4">
@@ -59,6 +71,7 @@ export default function BillsView({ ordersWaitingPayment, onPay, onEdit }) {
           ))
         )}
       </div>
+      <OrderDetailsModal isOpen={!!selectedOrder} order={selectedOrder} onClose={() => setSelectedOrder(null)} />
     </section>
   )
 }
